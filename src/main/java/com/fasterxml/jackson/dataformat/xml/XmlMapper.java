@@ -1,12 +1,10 @@
 package com.fasterxml.jackson.dataformat.xml;
 
 import java.io.IOException;
-
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
@@ -27,23 +25,17 @@ import com.fasterxml.jackson.dataformat.xml.util.XmlRootNameLookup;
  * Note that most of configuration should be done by pre-constructing
  * {@link JacksonXmlModule} explicitly, instead of relying on default settings.
  */
-public class XmlMapper extends ObjectMapper
-{
+public class XmlMapper extends ObjectMapper {
+
     // as of 2.6
     private static final long serialVersionUID = 1L;
 
-    protected final static JacksonXmlModule DEFAULT_XML_MODULE = new JacksonXmlModule();
+    protected static final JacksonXmlModule DEFAULT_XML_MODULE = new JacksonXmlModule();
 
-    protected final static DefaultXmlPrettyPrinter DEFAULT_XML_PRETTY_PRINTER = new DefaultXmlPrettyPrinter();
+    protected static final DefaultXmlPrettyPrinter DEFAULT_XML_PRETTY_PRINTER = new DefaultXmlPrettyPrinter();
 
     // need to hold on to module instance just in case copy() is used
     protected final JacksonXmlModule _xmlModule;
-
-    /*
-    /**********************************************************
-    /* Life-cycle: construction, configuration
-    /**********************************************************
-     */
 
     public XmlMapper() {
         this(new XmlFactory());
@@ -71,8 +63,7 @@ public class XmlMapper extends ObjectMapper
         this(new XmlFactory(), module);
     }
 
-    public XmlMapper(XmlFactory xmlFactory, JacksonXmlModule module)
-    {
+    public XmlMapper(XmlFactory xmlFactory, JacksonXmlModule module) {
         /* Need to override serializer provider (due to root name handling);
          * deserializer provider fine as is
          */
@@ -92,8 +83,7 @@ public class XmlMapper extends ObjectMapper
     }
 
     @Override
-    public XmlMapper copy()
-    {
+    public XmlMapper copy() {
         _checkInvalidCopy(XmlMapper.class);
         return new XmlMapper(this);
     }
@@ -108,7 +98,6 @@ public class XmlMapper extends ObjectMapper
     /* Additional XML-specific configurations
     /**********************************************************
      */
-
     /**
      * Method called by {@link JacksonXmlModule} to pass configuration
      * information to {@link XmlFactory}, during registration; NOT
@@ -140,39 +129,38 @@ public class XmlMapper extends ObjectMapper
     /* Access to configuration settings
     /**********************************************************
      */
-
     @Override
     public XmlFactory getFactory() {
         return (XmlFactory) _jsonFactory;
     }
-    
+
     public ObjectMapper configure(ToXmlGenerator.Feature f, boolean state) {
-        ((XmlFactory)_jsonFactory).configure(f, state);
+        ((XmlFactory) _jsonFactory).configure(f, state);
         return this;
     }
 
     public ObjectMapper configure(FromXmlParser.Feature f, boolean state) {
-        ((XmlFactory)_jsonFactory).configure(f, state);
+        ((XmlFactory) _jsonFactory).configure(f, state);
         return this;
     }
 
     public ObjectMapper enable(ToXmlGenerator.Feature f) {
-        ((XmlFactory)_jsonFactory).enable(f);
+        ((XmlFactory) _jsonFactory).enable(f);
         return this;
     }
 
     public ObjectMapper enable(FromXmlParser.Feature f) {
-        ((XmlFactory)_jsonFactory).enable(f);
+        ((XmlFactory) _jsonFactory).enable(f);
         return this;
     }
 
     public ObjectMapper disable(ToXmlGenerator.Feature f) {
-        ((XmlFactory)_jsonFactory).disable(f);
+        ((XmlFactory) _jsonFactory).disable(f);
         return this;
     }
 
     public ObjectMapper disable(FromXmlParser.Feature f) {
-        ((XmlFactory)_jsonFactory).disable(f);
+        ((XmlFactory) _jsonFactory).disable(f);
         return this;
     }
 
@@ -181,7 +169,6 @@ public class XmlMapper extends ObjectMapper
     /* XML-specific access
     /**********************************************************
      */
-
     /**
      * Method for reading a single XML value from given XML-specific input
      * source; useful for incremental data-binding, combining traversal using
@@ -191,7 +178,7 @@ public class XmlMapper extends ObjectMapper
      */
     public <T> T readValue(XMLStreamReader r, Class<T> valueType) throws IOException {
         return readValue(r, _typeFactory.constructType(valueType));
-    } 
+    }
 
     /**
      * Method for reading a single XML value from given XML-specific input
@@ -202,7 +189,7 @@ public class XmlMapper extends ObjectMapper
      */
     public <T> T readValue(XMLStreamReader r, TypeReference<T> valueTypeRef) throws IOException {
         return readValue(r, _typeFactory.constructType(valueTypeRef));
-    } 
+    }
 
     /**
      * Method for reading a single XML value from given XML-specific input
@@ -212,11 +199,10 @@ public class XmlMapper extends ObjectMapper
      * @since 2.4
      */
     @SuppressWarnings("resource")
-    public <T> T readValue(XMLStreamReader r, JavaType valueType) throws IOException
-    {
+    public <T> T readValue(XMLStreamReader r, JavaType valueType) throws IOException {
         FromXmlParser p = getFactory().createParser(r);
-        return super.readValue(p,  valueType);
-    } 
+        return super.readValue(p, valueType);
+    }
 
     /**
      * Method for serializing given value using specific {@link XMLStreamReader}:
@@ -226,25 +212,24 @@ public class XmlMapper extends ObjectMapper
      * @since 2.4
      */
     public void writeValue(XMLStreamWriter w0, Object value) throws IOException {
-        @SuppressWarnings("resource")
-        ToXmlGenerator g = getFactory().createGenerator(w0);
+        @SuppressWarnings("resource") ToXmlGenerator g = getFactory().createGenerator(w0);
         super.writeValue(g, value);
-        /* NOTE: above call should do flush(); and we should NOT close here.
+    /* NOTE: above call should do flush(); and we should NOT close here.
          * Finally, 'g' has no buffers to release.
          */
     }
-    
+
     /*
     /**********************************************************
     /* Overridden methods
     /**********************************************************
      */
-
     // 09-May-2016, tatu: Was removed from `jackson-databind` in 2.8; remove from
     //    here in 2.9.
-    @Deprecated // since 2.6
-//    @Override
-    protected PrettyPrinter _defaultPrettyPrinter() {
+    // since 2.6
+    @Deprecated
+    protected //    @Override
+    PrettyPrinter _defaultPrettyPrinter() {
         return new DefaultXmlPrettyPrinter();
     }
 }
